@@ -231,9 +231,7 @@ trait Huffman extends HuffmanInterface:
    * sub-trees, think of how to build the code table for the entire tree.
    */
   def convert(tree: CodeTree): CodeTable = tree match
-    case Fork(left, right, _, _) => {
-      convert(left).map((chr, bits) => (chr, 0 :: bits)) ::: convert(right).map((chr, bits) => (chr, 1 :: bits))
-    }
+    case Fork(left, right, _, _) => mergeCodeTables(convert(left), convert(right))
     case Leaf(char, _) => List((char, List[Bit]()))
 
   /**
@@ -241,7 +239,11 @@ trait Huffman extends HuffmanInterface:
    * use it in the `convert` method above, this merge method might also do some transformations
    * on the two parameter code tables.
    */
-  def mergeCodeTables(a: CodeTable, b: CodeTable): CodeTable = ???
+  def mergeCodeTables(a: CodeTable, b: CodeTable): CodeTable = {
+    def insertBit(bit: Bit)(table: CodeTable): CodeTable =
+      table.map((chr, bits) => (chr, bit :: bits))
+    insertBit(0)(a) ::: insertBit(1)(b)
+  }
 
   /**
    * This function encodes `text` according to the code tree `tree`.
