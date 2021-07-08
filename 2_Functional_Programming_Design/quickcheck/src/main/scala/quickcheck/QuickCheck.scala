@@ -41,19 +41,15 @@ abstract class QuickCheckHeap extends Properties("Heap") with IntHeap:
       deleteMin(insert(x, empty)) == empty
     }
 
-  def popMin(h: H): List[Int] = if !isEmpty(h) then findMin(h) :: popMin(deleteMin(h)) else Nil
 
   // Given any heap, you should get a sorted sequence of elements when continually finding and deleting minima. (Hint: recursion and helper functions are your friends.)
   property("finding and deleting minimum should yield sorted sequence of elements") = forAll {
     (x: Int, y: Int, z: Int) =>
+      def popMin(h: H): List[Int] = if !isEmpty(h) then findMin(h) :: popMin(deleteMin(h)) else Nil
       popMin(insert(x, insert(y, insert(z, empty)))) == List(x, y, z).sorted
   }
 
   // Finding a minimum of the melding of any two heaps should return a minimum of one or the other.
   property("Finding a minimum of the melding of any two heaps should return a minimum of one or the other") = forAll {
-    (h1: H, h2: H, x: Int, y: Int) =>
-      if isEmpty(h1) && isEmpty(h2) then findMin(meld(insert(x, h1), insert(y, h2))) == List(x, y).min
-      else if isEmpty(h1) then findMin(meld(insert(x, h1), h2)) == List(findMin(h1), findMin(h2), x).min
-      else if isEmpty(h2) then findMin(meld(h1, insert(x, h2))) == List(findMin(h1), findMin(h2), x).min
-      else findMin(meld(h1, h2)) == List(findMin(h1), findMin(h2)).min
+    (h1: H, h2: H) => findMin(meld(h1, h2)) == Math.min(findMin(h1), findMin(h2))
   }
