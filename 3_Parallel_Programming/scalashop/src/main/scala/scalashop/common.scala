@@ -32,15 +32,31 @@ def clamp(v: Int, min: Int, max: Int): Int =
 
 /** Image is a two-dimensional matrix of pixel values. */
 class Img(val width: Int, val height: Int, private val data: Array[RGBA]):
-  def this(w: Int, h: Int) = this(w, h, new Array(w * h))
-  def apply(x: Int, y: Int): RGBA = data(y * width + x)
+  def this(w: Int, h: Int) = this(w, h, new Array(w * h)) // when constructed without passing data parameter
+  def apply(x: Int, y: Int): RGBA = data(y * width + x) // return pixel at img[x][y] (*data is 1 dimensional)
   def update(x: Int, y: Int, c: RGBA): Unit = data(y * width + x) = c
+  override def toString: String = (0 until width).map(x => this.apply(x, 0)).toString()
 
 /** Computes the blurred RGBA value of a single pixel of the input image. */
-def boxBlurKernel(src: Img, x: Int, y: Int, radius: Int): RGBA =
-
+def boxBlurKernel(src: Img, x: Int, y: Int, radius: Int): RGBA = {
   // TODO implement using while loops
-  ???
+  def extractChannel(f: RGBA => Int): IndexedSeq[Int] =
+    for {
+      i <- y-radius to y+radius
+      j <- x-radius to x+radius
+      if i >= 0 && i < src.height
+      if j >= 0 && j < src.width
+    } yield clamp(f(src(j, i)), 0, 255)
+    
+  def getAverage(s: IndexedSeq[Int]): Int = s.sum / s.length
+  
+  rgba(
+    getAverage(extractChannel(red)),
+    getAverage(extractChannel(green)),
+    getAverage(extractChannel(blue)),
+    getAverage(extractChannel(alpha))
+  )
+}
 
 val forkJoinPool = ForkJoinPool()
 
