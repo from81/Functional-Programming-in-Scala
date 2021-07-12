@@ -48,7 +48,28 @@ object ParallelCountChange extends ParallelCountChangeInterface:
    *  coins for the specified amount of money.
    */
   def countChange(money: Int, coins: List[Int]): Int =
-    ???
+    def countChangeRecur(money: Int, coins: Array[Int]): Int =
+      var mutable_coins = coins
+
+      if money > 0 && coins.nonEmpty then
+        var nCombinations = 0
+
+        for _ <- 0 until coins.length do
+          var remaining_money = money
+          val coin = mutable_coins.head
+          mutable_coins = mutable_coins.tail
+
+          while remaining_money >= coin do
+            remaining_money -= coin
+            nCombinations += countChangeRecur(remaining_money, mutable_coins)
+
+        nCombinations
+      else if money == 0 then 1
+      else 0
+    end countChangeRecur
+
+    countChangeRecur(money, coins.toArray)
+  end countChange
 
   type Threshold = (Int, List[Int]) => Boolean
 
@@ -56,7 +77,29 @@ object ParallelCountChange extends ParallelCountChangeInterface:
    *  specified list of coins for the specified amount of money.
    */
   def parCountChange(money: Int, coins: List[Int], threshold: Threshold): Int =
-    ???
+    def parCountChangeRecur(money: Int, coins: Array[Int]): Int =
+
+      var mutable_coins = coins
+
+      if money > 0 && coins.nonEmpty then
+        var nCombinations = 0
+
+        for _ <- 0 until coins.length do
+          var remaining_money = money
+          val coin = mutable_coins.head
+          mutable_coins = mutable_coins.tail
+
+          while remaining_money >= coin do
+            remaining_money -= coin
+            nCombinations += parCountChangeRecur(remaining_money, mutable_coins)
+
+        nCombinations
+      else if money == 0 then 1
+      else 0
+    end parCountChangeRecur
+
+    parCountChangeRecur(money, coins.toArray)
+  end parCountChange
 
   /** Threshold heuristic based on the starting money. */
   def moneyThreshold(startingMoney: Int): Threshold =
