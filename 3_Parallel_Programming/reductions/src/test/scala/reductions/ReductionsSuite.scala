@@ -16,8 +16,11 @@ class ReductionsSuite extends munit.FunSuite:
     assertEquals(output.toList, List(0f, 1f, 4f, 4f))
   }
 
-
-
+  test("lineOfSight should correctly handle an array of size 4") {
+    val output = new Array[Float](4)
+    parLineOfSight(Array[Float](0f, 1f, 8f, 9f), output, 2)
+    assertEquals(output.toList, List(0f, 1f, 4f, 4f))
+  }
 
   /*******************************
    * PARALLEL COUNT CHANGE SUITE *
@@ -98,6 +101,26 @@ class ReductionsSuite extends munit.FunSuite:
    **********************************/
 
   import ParallelParenthesesBalancing.*
+
+  test("balance: '(if (zero? x) max (/ 1 x))' is balanced") {
+    assert(balance("(if (zero? x) max (/ 1 x))".toArray))
+  }
+
+  test("balance: 'I told him ...' is balanced") {
+    assert(balance("I told him (that it's not (yet) done).\n(But he wasn't listening)".toArray))
+  }
+
+  test("balance: ':-)' is unbalanced") {
+    assert(!balance(":-)".toArray))
+  }
+
+  test("balance: counting is not enough") {
+    assert(!balance("())(".toArray))
+  }
+
+  test("balance") {
+    assert(!balance("(o_()".toArray))
+  }
 
   test("balance should work for empty string") {
     def check(input: String, expected: Boolean) =
