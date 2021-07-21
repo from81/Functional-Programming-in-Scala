@@ -1,3 +1,3 @@
-[debug] not up to date. inChanged = true, force = false
-[debug] Updating ProjectRef(uri("file:/Users/Kai/Dropbox/Documents/Code/scala/Functional%20Programming%20Scala/effective_programming/todo/project/"), "todo-build")...
-[debug] Done updating ProjectRef(uri("file:/Users/Kai/Dropbox/Documents/Code/scala/Functional%20Programming%20Scala/effective_programming/todo/project/"), "todo-build")
+[0m[[0m[0mdebug[0m] [0m[0mnot up to date. inChanged = true, force = false[0m
+[0m[[0m[0mdebug[0m] [0m[0mUpdating ProjectRef(uri("file:/Users/Kai/Dropbox/Documents/Code/scala/Functional%20Programming%20Scala/effective_programming/todo/project/"), "todo-build")...[0m
+[0m[[0m[0mdebug[0m] [0m[0mDone updating ProjectRef(uri("file:/Users/Kai/Dropbox/Documents/Code/scala/Functional%20Programming%20Scala/effective_programming/todo/project/"), "todo-build")[0m
