@@ -2,4 +2,4 @@
 .DS_Store
 .idea
 
-effective_programming/todo/id.json effective_programming/todo/tasks.json
+effective_programming/todo/*.json
