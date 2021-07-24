@@ -21,7 +21,9 @@ final class Wikigraph(client: Wikipedia):
     * Hint: Use the methods that you implemented in WikiResult.
     */
   def namedLinks(of: ArticleId): WikiResult[Set[String]] =
-    ???
+    this.client.linksFrom(of).flatMap(
+      articleIds => WikiResult.traverse[ArticleId, String](articleIds.toSeq)(client.nameOfArticle).map(_.toSet)
+    )
 
   /**
     * Computes the distance between two articles using breadth first search.
@@ -59,7 +61,22 @@ final class Wikigraph(client: Wikipedia):
       * @param q the next nodes to visit and their distance from `start`
       */
     def iter(visited: Set[ArticleId], q: Queue[(Int, ArticleId)]): WikiResult[Option[Int]] =
-      ???
+      if (q.nonEmpty) then
+        val ((currentDepth, currentArticle), updatedQueue) = q.dequeue
+        if (currentDepth >= maxDepth) then WikiResult.successful(None)
+        else client.linksFrom(currentArticle).flatMap(articleIds =>
+          if (articleIds.contains(target)) then WikiResult.successful(Some(currentDepth))
+          else iter(
+            visited + currentArticle,
+            updatedQueue.enqueueAll(
+              articleIds.filter(articleId => !visited.contains(articleId))
+                .map(articleId => (currentDepth + 1, articleId))
+            )
+          )
+        ).fallbackTo(iter(visited + currentArticle, updatedQueue))
+      else WikiResult.successful(None)
+    end iter
+
     if start == target then WikiResult.successful(Some(0))
     else iter(Set(start), Queue(1->start))
 
@@ -77,5 +94,18 @@ final class Wikigraph(client: Wikipedia):
     *       breadthFirstSearch
     */
   def distanceMatrix(titles: List[String], maxDepth: Int = 50): WikiResult[Seq[(String, String, Option[Int])]] =
-    ???
+    val allArticlePairs = for {
+      source <- titles
+      dest <- titles
+      if source != dest
+    } yield (source, dest)
+
+    WikiResult.traverse[(String, String), (String, String, Option[Int])](allArticlePairs){
+      (sourceTitle, destTitle) => client.searchId(sourceTitle).zip(client.searchId(destTitle)).flatMap {
+        (sourceId, destId) => breadthFirstSearch(sourceId, destId, maxDepth).flatMap{
+          distance => WikiResult.successful(sourceTitle, destTitle, distance)
+        }
+      }
+    }
+  end distanceMatrix
 end Wikigraph
